@@ -1,7 +1,21 @@
-export default function Home() {
+"use client";
+
+import Navbar from "@/components/sections/Navbar";
+import Hero from "@/components/sections/Hero";
+import Destinos from "@/components/sections/Destinos";
+import Pacotes from "@/components/sections/Pacotes";
+import Contato from "@/components/sections/Contato";
+import Footer from "@/components/sections/Footer";
+
+export default function HomePage() {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <h1 className="text-4xl font-bold">Travel Agency — Coming soon...</h1>
-    </main>
+    <div className="relative min-h-screen overflow-hidden">
+      <Navbar />
+      <Hero />
+      <Destinos />
+      <Pacotes />
+      <Contato/>
+      <Footer />
+    </div>
   );
 }
