@@ -30,7 +30,8 @@ export default function Contato() {
   const [valor, setValor] = useState<number | "">("");
   const [moedaOrigem, setMoedaOrigem] = useState("BRL");
   const [moedaDestino, setMoedaDestino] = useState("USD");
-  const [resultado, setResultado] = useState("-");
+  const [resultado, setResultado] = useState<number | "Erro" | "-">("-");
+  const [proporcao, setProporcao] = useState<number>(0);
 
   async function converterMoeda() {
     if (!valor || valor <= 0) return;
@@ -46,13 +47,16 @@ export default function Contato() {
       const taxa = parseFloat(data[chave].bid);
 
       const valorConvertido = valor * taxa;
-      setResultado(valorConvertido.toFixed(2));
+      setResultado(valorConvertido);
+      setProporcao(taxa);
     } catch (err) {
       console.error("Erro ao converter moedas:", err);
       setResultado("Erro");
+      setProporcao(0);
     }
   }
 
+  const moedaOrigemNome = moedas.find((m) => m.codigo === moedaOrigem)?.nome ?? "";
   const moedaDestinoNome = moedas.find((m) => m.codigo === moedaDestino)?.nome ?? "";
 
   return (
@@ -63,27 +67,27 @@ export default function Contato() {
     >
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-start">
         <div className="flex flex-col gap-6">
-            <h3 className="text-4xl md:text-5xl font-bold mb-4">Entre em Contato</h3>
-            <p className="text-xl md:text-2xl mb-4 max-w-md">
+          <h3 className="text-4xl md:text-5xl font-bold mb-4">Entre em Contato</h3>
+          <p className="text-xl md:text-2xl mb-4 max-w-md">
             Quer saber mais sobre nossos pacotes ou tirar alguma dúvida? Preencha o formulário abaixo ou fale diretamente conosco.
-            </p>
-            <form className="flex flex-col gap-4">
+          </p>
+          <form className="flex flex-col gap-4">
             <input type="text" placeholder="Nome" className="p-4 rounded-lg text-gray-900" />
             <input type="email" placeholder="Email" className="p-4 rounded-lg text-gray-900" />
             <textarea placeholder="Mensagem" className="p-4 rounded-lg text-gray-900" rows={6} />
             <Button className="bg-blue-dark hover:bg-blue-light text-white rounded-xl px-6 py-4 font-semibold mt-4">
-                Enviar Mensagem
+              Enviar Mensagem
             </Button>
-            </form>
+          </form>
         </div>
 
         <div className="flex flex-col gap-6 justify-start">
-            <div>
+          <div>
             <h3 className="text-4xl md:text-5xl font-bold mb-10">Cotação</h3>
             <p className="text-xl md:text-2xl mb-10 max-w-md">
-                Para poupar seu tempo e economizar mais, faça a cotação de qualquer moeda aqui mesmo.
+              Para poupar seu tempo e economizar mais, faça a cotação de qualquer moeda aqui mesmo.
             </p>
-            </div>
+          </div>
 
           <div className="bg-white rounded-xl p-6 text-gray-900 shadow-xl w-full">
             <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
@@ -131,9 +135,20 @@ export default function Contato() {
             </form>
 
             <div className="mt-4 space-y-2 text-lg md:text-xl font-medium text-blue-dark">
-              <p>
-                {moedaDestinoNome} ({moedaDestino}): {resultado}
-              </p>
+              {resultado !== "-" && resultado !== "Erro" && (
+                <>
+                  <p>
+                    {moedaOrigemNome} ({moedaOrigem}): {valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} → {moedaDestinoNome} ({moedaDestino}): {resultado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  <p>
+                    1 {moedaOrigemNome} ({moedaOrigem}) → {proporcao.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {moedaDestinoNome} ({moedaDestino})
+                  </p>
+                  <p>
+                    1 {moedaDestinoNome} ({moedaDestino}) → {(1 / proporcao).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {moedaOrigemNome} ({moedaOrigem})
+                  </p>
+                </>
+              )}
+              {resultado === "Erro" && <p>Erro ao converter moedas. Tente novamente.</p>}
             </div>
           </div>
         </div>
